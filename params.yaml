@@ -1,0 +1,61 @@
+generate:
+  generate_data_name: data
+  generate_prompt_name: set_idol_discription
+  model_config:
+    model: gpt-3.5-turbo
+
+judge:
+  submit_file_name: data_set_idol_discription
+  model_config: 
+    model: gpt-3.5-turbo
+  
+
+  rulebase_funcs:
+    - count_text_length
+    - check_megu_in_text
+
+  judge_menus:
+    - name: hime_in_text
+      prompt_name: check_if_category_in_text
+      prompt_insert:
+        - filling_variable_name: search_idol_name
+          filling_value: ひめ
+    - name: ruri_in_text
+      prompt_name: check_if_category_in_text
+      prompt_insert:
+        - filling_variable_name: search_idol_name
+          filling_value: るり
+    - name: ruri_in_text_in_3nensei
+      prompt_name: check_if_category_in_text
+      prompt_insert:
+        - filling_variable_name: search_idol_name
+          filling_value: るり
+      filter:
+        - filter_col_name: gakunen 
+          filter_value: 3年生
+    - name: ruri_in_text_in_2nensei
+      prompt_name: check_if_category_in_text
+      prompt_insert:
+        - filling_variable_name: search_idol_name
+          filling_value: るり
+      filter:
+        - filter_col_name: gakunen 
+          filter_value: 2年生
+      
+    - name: check_if_gakunen_in_text
+      prompt_name: check_if_gakunen_in_text
+
+  pairwise_menus:
+    - name: pair_kyokumei_dododo
+      prompt_name: pair_check_word
+      pair_csv_name: data_set_idol_discription_pair
+      prompt_insert:
+        - filling_variable_name: search_song_name
+          filling_value: ドドド
+
+    - name: pair_kyokumei_banyu
+      prompt_name: pair_check_word
+      pair_csv_name: data_set_idol_discription_pair
+      prompt_insert:
+        - filling_variable_name: search_song_name
+          filling_value: 万有グラビティ

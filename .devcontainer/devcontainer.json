@@ -1,0 +1,13 @@
+{
+  "name": "Python Dev (Ubuntu + Python 3.10, CPU)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-toolsai.jupyter"
+  ],
+  "remoteUser": "vscode",
+  "forwardPorts": [5001]
+}

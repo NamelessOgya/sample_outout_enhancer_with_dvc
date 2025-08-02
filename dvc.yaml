@@ -1,0 +1,58 @@
+stages:
+  llm_generate:
+    cmd: poetry run python -m run.llm_generate --generate_target_name ${generate.generate_data_name} --prompt_name ${generate.generate_prompt_name}
+    deps:
+      - data/generate_target/${generate.generate_data_name}.csv
+      - src/generate/prompt/${generate.generate_prompt_name}.txt
+      - run/llm_generate.py
+    outs:
+      - data/submit/${generate.generate_data_name}_${generate.generate_prompt_name}.csv
+    params:
+      - generate
+
+  rulebase_evaluate:
+    foreach: ${judge.rulebase_funcs}
+    do: 
+      cmd: python -m run.rulebase_evaluate --rulebase_func_name ${item} --submit_file_name ${judge.submit_file_name}
+      deps:
+        - data/submit/${judge.submit_file_name}.csv
+        - src/judge/rulebase_funcs/${item}.py
+        - run/rulebase_evaluate.py
+      outs:
+        - data/result/rulebase_${judge.submit_file_name}_${item}.json
+
+  llm_evaluate:
+    foreach: ${judge.judge_menus}
+    do: 
+      cmd: python -m run.llm_evaluate --judge_name ${item.name} --submit_file_name ${judge.submit_file_name}
+      deps:
+        - data/submit/${judge.submit_file_name}.csv
+        - src/judge/prompt/${item.prompt_name}.txt
+        - run/llm_evaluate.py
+      outs:
+        - data/result/llm_${judge.submit_file_name}_${item.name}.json
+
+  llm_pairwise_evaluate:
+    foreach: ${judge.pairwise_menus}
+    do: 
+      cmd: python -m run.llm_evaluate --judge_name ${item.name} --submit_file_name ${judge.submit_file_name}
+      deps:
+        - data/submit/${judge.submit_file_name}.csv
+        - data/submit/${item.pair_csv_name}.csv
+        - src/judge/prompt/${item.prompt_name}.txt
+        - run/llm_evaluate.py
+      outs:
+        - data/result/llm_${judge.submit_file_name}_${item.name}_${item.pair_csv_name}.json
+
+
+  make_dashboard:
+    cmd: poetry run python -m run.make_dashboard
+    deps:
+      - data/result/
+      - run/make_dashboard.py
+    outs:
+      - data/dashboard/generate_history.csv
+      - data/dashboard/scores.csv
+      - data/dashboard/condition_mikoto_run_ids.csv
+      - data/dashboard/judge_history.csv
+  

@@ -1,0 +1,10 @@
+.dvc/cache/
+.dvc/tmp/
+.dvc/plots/
+
+__pycache__/
+*.py[cod]
+.env
+current_run.yaml
+
+mlruns/
