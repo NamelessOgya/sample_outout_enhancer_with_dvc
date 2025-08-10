@@ -16,24 +16,28 @@ from src.utils.hash_util import get_file_hash
 
 
 def main():
+    """
+        セグメントごとに新たな世代のテキストを生成する。
+        プロンプトevolveの機能は別ファイルで実装する。
+
+        - n=0の場合、各セグメントごとにランダムにテキストを生成する。
+            - ./data/gen{genearation}/evolve_result.csv の各セグメントに対してテキスト生成する。  
+        - n>0の場合、前の世代のテキストを元に、各セグメントごとに新たなテキストを生成する。
+            - ./data/{exp_name}/gen_{genearation-1}/evolve_result.csv の各セグメントに対してテキスト生成する。  
+        生成したテキストを./data/gen{genearation}_{mokoto_run_id}/evolve_result.csv  に保存する。
+
+    """
     parser = argparse.ArgumentParser(description="evaluate時の引数")
     parser.add_argument('--judge_name', type=str, required=True, help="名前を指定")
     parser.add_argument('--submit_file_name', type=str, required=True, help="名前を指定")
+    parser.add_argument('--generation', type=int, required=True, help="名前を指定")
 
     args = parser.parse_args()
 
     with open("params.yaml", "r") as f:
-        judge_config = yaml.safe_load(f)["judge"]
+        evolve_config = yaml.safe_load(f)["evolve"]
 
-
-    judge_menu = None
-    for m in (judge_config["judge_menus"] + judge_config["pairwise_menus"]):
-        if args.judge_name == m["name"]:
-            judge_menu = m
-
-    if judge_menu is None:
-        raise NotImplemented
-
+    
     submit = pd.read_csv(f"./data/submit/{args.submit_file_name}.csv")  # todo: config指定できるように  
 
     # pairwise evaluateのために、pair側の出力をカラムに追加する。  
